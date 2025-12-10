@@ -93,15 +93,17 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #e7d3d3;
+      background: linear-gradient(135deg, #f5e6e0 0%, #e8d5cc 50%, #dcc4b6 100%);
       z-index: 100;
     }
 
     .loading-message {
       font-size: 13px;
-      text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.8);
-      color: white;
+      text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+      color: #8b5a5a;
       text-align: center;
+      font-weight: 500;
+      letter-spacing: 0.5px;
     }
 
     .blocklove {
@@ -179,7 +181,7 @@
 </head>
 
 <body>
-  <div class="overlay">
+  <div class="overlay" id="overlay">
     <div class="loading-message">Các bạn<br />chờ chút nhé...</div>
     <!-- Tombol Love -->
     <div id="loveIn" class="blocklove">
@@ -673,21 +675,56 @@
   });
 </script>
 <script>
+  // Ẩn overlay sau 1.5 giây thay vì chờ toàn bộ page load
+  setTimeout(function() {
+    var overlayDiv = document.getElementById("overlay");
+    if (overlayDiv) {
+      overlayDiv.style.opacity = "0";
+      overlayDiv.style.transition = "opacity 0.5s ease-out";
+      setTimeout(function() {
+        overlayDiv.style.display = "none";
+        // Phát nhạc khi overlay tắt xong
+        var audio = document.getElementById("my_audio");
+        if (audio) {
+          audio.play().catch(function(error) {
+            console.log("Autoplay blocked:", error);
+          });
+        }
+      }, 500);
+    }
+  }, 1500);
+
+  // Dừng falling hearts khi overlay tắt
+  var heartsInterval = null;
+  function startHearts() {
+    if (!heartsInterval) {
+      heartsInterval = setInterval(fallingHearts, 200);
+    }
+  }
 
   window.addEventListener("load", (event) => {
     window.scrollTo(0, 0);
-    var overlay = document.querySelector(".loading-message");
-    overlay.style.display = "none"; 
-    var tomlv = document.querySelector(".blocklove");
-    tomlv.style.display = "flex"; 
   });
 
   var sudahKlik = true; 
   document.getElementById('loveIn').innerHTML = '<style>.lovein svg{animation:none;stroke:#ff0000;stroke-width:1.3;fill:none;width:35px;height:35px}</style><label class="lovein"><svg class="line" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g transform="translate(2.550170, 3.550158)"><path d="M0.371729633,8.89614246 C-0.701270367,5.54614246 0.553729633,1.38114246 4.07072963,0.249142462 C5.92072963,-0.347857538 8.20372963,0.150142462 9.50072963,1.93914246 C10.7237296,0.0841424625 13.0727296,-0.343857538 14.9207296,0.249142462 C18.4367296,1.38114246 19.6987296,5.54614246 18.6267296,8.89614246 C16.9567296,14.2061425 11.1297296,16.9721425 9.50072963,16.9721425 C7.87272963,16.9721425 2.09772963,14.2681425 0.371729633,8.89614246 Z"></path><path d="M13.23843,4.013842 C14.44543,4.137842 15.20043,5.094842 15.15543,6.435842"></path></g></svg></label><p id="ket">Chạm vào trái tim</p>';
 
   document.getElementById("loveIn").onclick = function () {
+    var overlayDiv = document.getElementById("overlay");
     if (sudahKlik) {
-      document.querySelector(".overlay").style.display = "none"; 
+      overlayDiv.style.opacity = "0";
+      overlayDiv.style.transition = "opacity 0.5s ease-out";
+      setTimeout(function() {
+        overlayDiv.style.display = "none";
+        // Phát nhạc khi nhấn trái tim
+        var audio = document.getElementById("my_audio");
+        if (audio) {
+          audio.play().catch(function(error) {
+            console.log("Autoplay blocked:", error);
+          });
+        }
+      }, 500);
+      startHearts(); // Bắt đầu hearts animation
     } else {
       sudahKlik = true; 
       document.getElementById('loveIn').innerHTML = '<style>.lovein svg{animation:none;stroke:#ff0000;stroke-width:1.3;fill:none;width:35px;height:35px}</style><label class="lovein"><svg class="line" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g transform="translate(2.550170, 3.550158)"><path d="M0.371729633,8.89614246 C-0.701270367,5.54614246 0.553729633,1.38114246 4.07072963,0.249142462 C5.92072963,-0.347857538 8.20372963,0.150142462 9.50072963,1.93914246 C10.7237296,0.0841424625 13.0727296,-0.343857538 14.9207296,0.249142462 C18.4367296,1.38114246 19.6987296,5.54614246 18.6267296,8.89614246 C16.9567296,14.2061425 11.1297296,16.9721425 9.50072963,16.9721425 C7.87272963,16.9721425 2.09772963,14.2681425 0.371729633,8.89614246 Z"></path><path d="M13.23843,4.013842 C14.44543,4.137842 15.20043,5.094842 15.15543,6.435842"></path></g></svg></label><p id="ket">Chạm vào trái tim</p>';
@@ -703,16 +740,14 @@
   }
   setInterval(function () {
     var heartArr = document.querySelectorAll(".heart-icon");
-    if (heartArr.length > 100) {
+    if (heartArr.length > 50) { // Giảm từ 100 xuống 50
       heartArr[0].remove();
     }
   }, 100);
 
 
   document.addEventListener("DOMContentLoaded", function () {
-
-    setInterval(fallingHearts, 200);
-
+    startHearts(); // Bắt đầu hearts animation
   });
 </script>
 </body>
